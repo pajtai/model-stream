@@ -1,21 +1,15 @@
 'use strict';
 
-var _h = require('highland');
+var _h = require('highland'),
+    _ = require('lodash'),
+    getSetter = require('get-setter');
 
-function Model(initialData) {
-    if (! (this instanceof Model)) {
-        return new Model(initialData);
+function Model(initialData, rules) {
+    if (!(this instanceof Model)) {
+        return new Model(initialData, rules);
     }
 
     this.stream = _h();
-    this.stream.write(initialData);
 }
-
-Model.prototype.update = update;
 
 module.exports = Model;
-
-function update(data) {
-    this.stream.write(data);
-    return this;
-}
