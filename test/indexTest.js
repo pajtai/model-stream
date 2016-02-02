@@ -18,7 +18,7 @@ describe('model stream', function() {
             });
         });
 
-        it('initialization adds to the stream', function(done) {
+        it.only('initialization adds to the stream', function(done) {
             var stream = Model({
                 a : 1
             }).stream;
@@ -41,6 +41,9 @@ describe('model stream', function() {
             });
         });
 
+        // Use zip
+        //model.stream.filter(Model.valid).filter(Model.filter()).map(Model.log);
+        //model.stream('user.name.first')
         xit('should set vaildated to false after any set');
         xit('should be able to set multiple values by passing in an array');
         xit('should be able to skip validation by setting options.validate to false');
