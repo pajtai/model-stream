@@ -2,7 +2,13 @@
 
 var _h = require('highland'),
     _ = require('lodash'),
-    getSetter = require('get-setter');
+    getSetter = require('get-setter'),
+    staticMethods = require('./static');
+
+Model.only = {
+    data : staticMethods.dataOnly,
+    key : staticMethods.keyOnly
+};
 
 // Click through to the methods for comments
 Model.prototype.set = set;
@@ -45,6 +51,8 @@ function Model(initialData) {
  */
 function set(key, value) {
     getSetter.set.call(this._data, key, value);
+    this._lastSet = key;
+    this.stream.write(this.getState());
     return this;
 }
 
