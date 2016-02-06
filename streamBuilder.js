@@ -2,22 +2,41 @@
 
 var _h = require('highland');
 
-module.exports = {
-    dataOnly : _h.map(dataOnly),
-    keyOnly : keyOnly
-};
+StreamBuilder.prototype.data = data;
+StreamBuilder.prototype.key = key;
+
+module.exports = StreamBuilder;
+
+function StreamBuilder(model) {
+    this.stream = model.stream;
+    return this;
+}
+
+function data() {
+    var self = this;
+    return new StreamBuilder({
+        stream : self.stream.map(dataOnly)
+    });
+}
+
+function key(keyIn) {
+    var self = this;
+    return new StreamBuilder({
+        stream : self.stream.filter(filterToKey(keyIn))
+    });
+}
+
+function filterToKey(subscribedKey) {
+    return function(fullData) {
+        return filterKeysOfInterest(fullData.set, subscribedKey);
+    }
+}
 
 function dataOnly(fullData) {
     return fullData.data;
 }
 
-function keyOnly(key, stream) {
-    return stream.filter(function filterToKey(fullData) {
-        return notifySubscriber(fullData.set, key);
-    });
-}
-
-function notifySubscriber(changedPath, subscribedKey) {
+function filterKeysOfInterest(changedPath, subscribedKey) {
 
     var startsWith,
         contains,

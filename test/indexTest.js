@@ -77,7 +77,7 @@ describe('model stream', function() {
     describe('stream usage', function() {
         it('Model.only.data should create a stream of only data', function(done) {
             var model = new Model(),
-                dataOnly = Model.only.data(model.stream);
+                dataOnly = model.transform().data().stream;
 
             model.set('a.b','c');
             model.set('d', 'e');
@@ -94,10 +94,11 @@ describe('model stream', function() {
                 })
         });
 
-        it.only('Model.only.key should create a stream of only sets that affect that key', function(done) {
+        it('Model.only.key should create a stream of only sets that affect that key', function(done) {
             var model = new Model(),
-                user = Model.only.key('user', model.stream),
-                data = Model.only.data(user);
+                user = model
+                    .transform()
+                    .key('user').stream;
 
             model.set('user.name', 'bob');
             model.set('views.modal', true);
@@ -105,8 +106,11 @@ describe('model stream', function() {
             model.set('user.name', 'jan');
             model.stream.write(_h.nil);
 
-            data.toArray(function(data) {
-                console.log(JSON.stringify(data,null,2));
+            user.toArray(function(data) {
+                data.length.should.equal(3);
+                data[0].set.should.equal('');
+                data[1].set.should.equal('user.name');
+                data[2].set.should.equal('user.name');
                 done();
             });
         });

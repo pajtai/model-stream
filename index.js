@@ -3,12 +3,7 @@
 var _h = require('highland'),
     _ = require('lodash'),
     getSetter = require('get-setter'),
-    staticMethods = require('./static');
-
-Model.only = {
-    data : staticMethods.dataOnly,
-    key : staticMethods.keyOnly
-};
+    StreamBuilder = require('./streamBuilder');
 
 // Click through to the methods for comments
 Model.prototype.set = set;
@@ -16,6 +11,7 @@ Model.prototype.get = get;
 Model.prototype.getState = getState;
 Model.prototype.rules = rules;
 Model.prototype.validate = validate;
+Model.prototype.transform = transform;
 
 module.exports = Model;
 
@@ -118,4 +114,8 @@ function validate() {
         }
     }
     return this;
+}
+
+function transform() {
+    return new StreamBuilder(this);
 }
