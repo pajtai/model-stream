@@ -11,7 +11,7 @@ Model.prototype.get = get;
 Model.prototype.getState = getState;
 Model.prototype.rules = rules;
 Model.prototype.validate = validate;
-Model.prototype.transform = transform;
+Model.prototype.stream = stream;
 
 module.exports = Model;
 
@@ -32,8 +32,8 @@ function Model(initialData) {
 
     this._lastSet = '';
 
-    this.stream = _h();
-    this.stream.write(this.getState());
+    this._stream = _h();
+    this._stream.write(this.getState());
 
     // just being explicit
     return this;
@@ -48,7 +48,7 @@ function Model(initialData) {
 function set(key, value) {
     getSetter.set.call(this._data, key, value);
     this._lastSet = key;
-    this.stream.write(this.getState());
+    this._stream.write(this.getState());
     return this;
 }
 
@@ -86,7 +86,7 @@ function rules(ruleSet) {
 
 /**
  * Will run the rules that were passed in via model.rules.
- * Listen to model.stream for updates.
+ * Listen to model._stream for updates.
  * @returns {validate}
  */
 function validate() {
@@ -116,6 +116,27 @@ function validate() {
     return this;
 }
 
-function transform() {
-    return new StreamBuilder(this);
+function stream(options) {
+    var data,
+        key,
+        builder;
+
+    if (!options) {
+        return this._stream;
+    }
+
+    data = options.data;
+    key = options.key;
+
+    builder = new StreamBuilder(this);
+
+    if (key) {
+        builder = builder.key(key);
+    }
+
+    if (data) {
+        builder = builder.data();
+    }
+
+    return builder._stream;
 }

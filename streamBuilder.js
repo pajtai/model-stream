@@ -8,21 +8,21 @@ StreamBuilder.prototype.key = key;
 module.exports = StreamBuilder;
 
 function StreamBuilder(model) {
-    this.stream = model.stream;
+    this._stream = model._stream;
     return this;
 }
 
 function data() {
     var self = this;
     return new StreamBuilder({
-        stream : self.stream.map(dataOnly)
+        _stream : self._stream.map(dataOnly)
     });
 }
 
 function key(keyIn) {
     var self = this;
     return new StreamBuilder({
-        stream : self.stream.filter(filterToKey(keyIn))
+        _stream : self._stream.filter(filterToKey(keyIn))
     });
 }
 

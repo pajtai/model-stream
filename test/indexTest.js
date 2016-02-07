@@ -21,7 +21,7 @@ describe('model stream', function() {
         it('initialization adds to the stream', function(done) {
             var stream = Model({
                 a : 1
-            }).stream;
+            }).stream()
 
             stream.pull(function(err, data) {
                 data.should.deep.equal({
@@ -48,7 +48,7 @@ describe('model stream', function() {
 
             model.set('a',2);
 
-            model.stream.pull(function(err, data ) {
+            model.stream().pull(function(err, data ) {
                 data.should.deep.equal({
                     data: {
                         a: 2
@@ -77,7 +77,9 @@ describe('model stream', function() {
     describe('stream usage', function() {
         it('Model.only.data should create a stream of only data', function(done) {
             var model = new Model(),
-                dataOnly = model.transform().data().stream;
+                dataOnly = model.stream({
+                    data : true
+                });
 
             model.set('a.b','c');
             model.set('d', 'e');
@@ -96,15 +98,15 @@ describe('model stream', function() {
 
         it('Model.only.key should create a stream of only sets that affect that key', function(done) {
             var model = new Model(),
-                user = model
-                    .transform()
-                    .key('user').stream;
+                user = model.stream({
+                    key : 'user'
+                });
 
             model.set('user.name', 'bob');
             model.set('views.modal', true);
             model.set('a.b.c','d');
             model.set('user.name', 'jan');
-            model.stream.write(_h.nil);
+            model.stream().write(_h.nil);
 
             user.toArray(function(data) {
                 data.length.should.equal(3);
@@ -141,7 +143,7 @@ describe('model stream', function() {
             model.set('user.name.first', '8 too much, Sr. III Esquire');
             model.validate();
 
-            model.stream.pull(function(err, state) {
+            model.stream().pull(function(err, state) {
                 state.meta.validation.valid.should.equal(false);
                 state.meta.validation.errors.should.deep.equal([
                     ['user.name.first', 'Sorry, numbers are not allowed as the first character of a name.']
